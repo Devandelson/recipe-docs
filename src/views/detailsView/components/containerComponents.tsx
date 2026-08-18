@@ -13,7 +13,7 @@ export default function containerComponent({ children, setSearchData, data }: {
     return (
         <AnimatePresence mode="wait">
             {data && (
-                <section className="w-full h-auto overflow-y-auto bg-gray-800 text-white max-md:fixed max-md:top-0 max-md:left-0 z-30 max-md:h-screen">
+                <section className="w-full max-w-75 h-auto overflow-y-auto bg-gray-800 text-white max-md:fixed max-md:max-w-full max-md:top-0 max-md:left-0 z-30 max-md:h-screen">
                     <FontAwesomeIcon
                         icon={faSquareXmark}
                         className="hidden absolute text-white text-3xl bottom-3 left-3 z-20 max-md:block cursor-pointer"
