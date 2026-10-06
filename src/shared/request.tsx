@@ -1,6 +1,6 @@
 import { type infoRequest, type meal } from './context/dataContext.tsx';
 
-export async function RequestData(): Promise<infoRequest> {
+export async function RequestData(page: number): Promise<infoRequest> {
     const categoryFetch = await fetch('https://www.themealdb.com/api/json/v1/1/list.php?c=list', {
         method: 'GET'
     });
@@ -14,9 +14,13 @@ export async function RequestData(): Promise<infoRequest> {
     const mealsFetch = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${selectMEal}`, {
         method: 'GET'
     });
-    const dataFetchM = await mealsFetch.json();
 
-    const resultM: infoRequest['meals'] = dataFetchM.meals.map((meal): meal => {  
+    // notes, just in case i'm gonna simulate a infinity scroll (cause the api doesn't have pagination).
+
+    const dataFetchM = await mealsFetch.json();
+    const maxPage = dataFetchM.meals.length;
+    const finalFetchM = dataFetchM.meals.slice(0, Math.min(page, maxPage));
+    const resultM: infoRequest['meals'] = finalFetchM.map((meal): meal => {
         return {
             idMeal: meal.idMeal,
             name: meal.strMeal,
@@ -28,7 +32,7 @@ export async function RequestData(): Promise<infoRequest> {
             typeInfo: 'server'
         };
     });
-    
+
     return {
         'categories': resultC,
         'meals': resultM,

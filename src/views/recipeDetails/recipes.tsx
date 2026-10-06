@@ -16,14 +16,14 @@ import { useProvider } from '@/shared/context/dataContext.tsx';
 
 // components
 import Header from '../header.tsx'
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
 
 interface ComponentRecipe {
     setInfoView: React.Dispatch<React.SetStateAction<ViewProps>>
 };
 
 export default function Recipes({ setInfoView }: ComponentRecipe) {
-    const { useRequest } = useProvider();
+    const { useRequest, setPage } = useProvider();
     const selectCategory = String(useRequest?.selectCategory).trim();
     const [loading, setLoading] = useState(false);
 
@@ -31,9 +31,22 @@ export default function Recipes({ setInfoView }: ComponentRecipe) {
         if (!useRequest?.meals) return;
         function runLoad() {
             setLoading(true);
+
         };
         runLoad();
     }, [useRequest])
+
+    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+        // The target of the event is the div that is being scrolled
+        const target = event.currentTarget;
+        const scrollTop = target.scrollTop;
+        const scrollHeight = target.scrollHeight;
+        const clientHeight = target.clientHeight;
+
+        if (clientHeight + scrollTop + 1 >= scrollHeight) {
+            setPage((prev) => (prev + prev));
+        }
+    };
 
     function handleView(e: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLSpanElement>) {
         e.preventDefault();
@@ -58,7 +71,7 @@ export default function Recipes({ setInfoView }: ComponentRecipe) {
     );
 
     return (
-        <motion.section className='p-4 h-screen grid grid-rows-[auto_auto_auto_auto_1fr]'
+        <motion.div className='p-4 h-screen grid grid-rows-[auto_auto_auto_auto_1fr]'
             initial={{
                 y: -15,
                 opacity: 0
@@ -74,20 +87,25 @@ export default function Recipes({ setInfoView }: ComponentRecipe) {
                 opacity: 0
             }}
         >
-            <div className='flex items-center gap-4  '>
+            <header className='flex items-center gap-4  '>
                 <img src={recipe} />
-                <div>
+                <section>
                     <h1 className="font-bold text-3xl">Recipes Docs</h1>
                     <p className="text-xl text-gray-700">Explore recipes from every corner of the globe, master new techniques, and bring exciting flavors to your table</p>
-                </div>
-            </div>
+                </section>
+            </header>
+
+            <section className='flex items-center justify-between gap-4 mt-3 mb-3'>
+                <button className="text-sm p-2 bg-blue-300 text-white rounded-sm hover:bg-blue-500 hover:shadow-2xl/50 hover:shadow-blue-900 transition-all cursor-pointer hover:scale-[1.02] active:scale-100 -mb-1 text-nowrap"
+                    onClick={(e) => { handleView(e) }} >Create your recipe</button>
+                <Header></Header>
+            </section>
 
 
-            <button className="text-sm p-2 bg-blue-300 text-white rounded-sm mt-3 hover:bg-blue-500 hover:shadow-2xl/50 hover:shadow-blue-900 transition-all cursor-pointer hover:scale-[1.02] active:scale-100 -mb-1"
-                onClick={(e) => { handleView(e) }} >Create your own recipe</button>
-            <Header></Header>
-
-            <div className='w-full overflow-y-auto grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 scrollbar-thumb-sky-700 scrollbar-track-sky-100 pr-1.5'>
+            <div className='w-full overflow-y-auto grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 scrollbar-thumb-sky-700 scrollbar-track-sky-100 pr-1.5'
+                onScroll={handleScroll}
+                id='scrollITems'
+            >
                 {
                     loading == false ? (waitMessage) :
                         (useRequest?.meals.length ?? 0 > 0) ? (
@@ -103,7 +121,7 @@ export default function Recipes({ setInfoView }: ComponentRecipe) {
                         )
                 }
             </div>
-        </motion.section>
+        </motion.div>
     )
 }
 
@@ -180,16 +198,27 @@ function RecipeItem({ name, img, country, setInfoView, idMeal, typeInfo }:
             <span className='w-full h-[80%] block top-[20%] left-0 bg-white -z-10 shadow-md absolute rounded-xl group-hover:shadow-2xl transition-all'></span>
             <span className='absolute p-1 px-3 rounded-3xl text-center top-7 left-7 z-10 bg-orange-200 text-sm'>From {country}</span>
 
-            {/* Controls */}
-            <span className='absolute p-2 px-2.5 rounded-full text-center top-33 left-7 z-10 bg-red-200 text-sm'
-                onClick={(e) => { handleDelete(e, idMeal) }}
-            ><FontAwesomeIcon icon={faTrashCan} /></span>
 
-            <span className='absolute p-2 px-2.5 rounded-full text-center top-33 left-18 z-10 bg-blue-200 text-sm' onClick={(e) => { SelectItem(idMeal, e, 'edit', typeInfo) }}><FontAwesomeIcon icon={faEdit} /></span>
-
-            <img src={img} className='w-full h-40.5 object-cover m-auto rounded-xl
+            <section className='relative w-full'>
+                <img src={img} className='w-full h-40.5 object-cover m-auto rounded-xl
             group-hover:scale-105 transition-all
             ' loading='lazy' />
+
+                {/* Controls */}
+                <span className='absolute p-2 px-2.5 rounded-xl rounded-tl-none rounded-br-none border-4 border-white border-l-0 border-b-0 text-center bottom-0 left-0 z-10 bg-red-200 text-sm cursor-pointer
+                
+                group-hover:scale-110 group-hover:-bottom-1 group-hover:-left-1
+                transition-all hover:scale-125 hover:bottom-0 hover:left-0 hover:bg-red-400 hover:text-white active:scale-75'
+                    onClick={(e) => { handleDelete(e, idMeal) }}
+                ><FontAwesomeIcon icon={faTrashCan} /></span>
+
+                <span className='absolute p-2 px-2.5 rounded-xl rounded-bl-none rounded-tr-none border-4 border-white border-r-0 border-b-0 text-center bottom-0 right-0 z-10 bg-blue-200 text-sm cursor-pointer
+                
+                group-hover:scale-110 group-hover:-bottom-1 group-hover:-right-1
+                transition-all hover:scale-125 hover:bottom-0 hover:right-0 hover:bg-blue-400 hover:text-white active:scale-75' onClick={(e) => { SelectItem(idMeal, e, 'edit', typeInfo) }}><FontAwesomeIcon icon={faEdit} /></span>
+                {/* ----------------- */}
+            </section>
+
 
             <h5 className="mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased mt-2 text-center">
                 {name}

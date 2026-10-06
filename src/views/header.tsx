@@ -6,7 +6,7 @@ import { type infoRequest } from '@/shared/context/dataContext.tsx';
 import { useState } from 'react';
 
 export default function Header() {
-    const { useRequest, setUserRequest } = useProvider();
+    const { useRequest, setUserRequest, setPage } = useProvider();
     const [existCategories, setExistCategories] = useState<string[]>([useRequest?.selectCategory ?? '']);
 
     async function handleCategory(
@@ -21,7 +21,7 @@ export default function Header() {
         const isCategoryFetched = existCategories.includes(value);
 
         if (isCategoryFetched) {
-            // Si ya existe, solo cambia la categoría activa conservando el estado anterior
+            // Datos cargados
             setUserRequest((prev: infoRequest | null) => {
                 if (!prev) return null;
                 return {
@@ -30,7 +30,7 @@ export default function Header() {
                 };
             });
         } else {
-            // Si no existe en caché, hace el fetch y acumula los datos
+            // Datos nuevos
             const mealsFetch = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${value}`);
             const dataFetchM = await mealsFetch.json();
 
@@ -47,12 +47,12 @@ export default function Header() {
                 typeInfo: 'server' as const
             }));
 
+            setPage(20);
             setUserRequest((prev: infoRequest | null) => ({
                 categories: prev?.categories ?? [],
                 selectCategory: value,
                 meals: [...resultM, ...(prev?.meals ?? [])]
             }));
-
             setExistCategories((prev) => [value, ...prev]);
         }
     }

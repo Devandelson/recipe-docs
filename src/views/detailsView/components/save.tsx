@@ -8,6 +8,7 @@ import React, { useState, type ChangeEvent } from 'react';
 // types
 import { type meal } from '@/shared/context/dataContext.tsx';
 import { type infoRequest } from '@/shared/context/dataContext.tsx';
+import type { ViewProps } from "../dView";
 
 // shared
 import { useProvider } from '@/shared/context/dataContext.tsx';
@@ -16,8 +17,8 @@ import { Toast } from '@/shared/customPopup.tsx';
 // componet
 import ContainerComponent from './containerComponents.tsx';
 
-export default function SaveView({ setSearchData, data }: {
-    setSearchData: React.Dispatch<React.SetStateAction<meal | null>>,
+export default function SaveView({ setInfoView, data }: {
+    setInfoView: React.Dispatch<React.SetStateAction<ViewProps>>,
     data: meal | null
 }) {
     const { useRequest, setUserRequest } = useProvider();
@@ -76,7 +77,10 @@ export default function SaveView({ setSearchData, data }: {
             return copyPrev;
         });
 
-        setSearchData(null);
+        setInfoView((prev => ({
+            ...prev,
+            stateView: 'closed'
+        })));
 
         Toast.fire({
             icon: 'success',
@@ -85,88 +89,77 @@ export default function SaveView({ setSearchData, data }: {
     }
 
     return (
-        <ContainerComponent setSearchData={setSearchData} data={data}>
+        <ContainerComponent setInfoView={setInfoView} data={data}>
             <h2 className="font-bold text-xl sm:text-2xl text-center">Creating New Meal</h2>
 
             <ControlImg preview={infoF.img} setInfoF={setInfoF} />
 
-            {/* Meal name */}
-            <div className='w-full flex flex-col items-start'>
-                <b className='text-base sm:text-lg'>Name:</b>
-                <input
-                    type="text"
-                    name="name"
-                    value={infoF.name}
-                    onChange={handleChange}
-                    placeholder='Dish name...'
-                    className='w-full bg-gray-200 p-2 rounded-sm text-sm sm:text-base'
-                />
-            </div>
+            <section className='w-full h-auto flex flex-col gap-3 mt-2 mb-2'>
+                {/* Nombre del plato */}
+                <div className='w-full flex flex-col items-start'>
+                    <b className='text-lg'>Name:</b>
+                    <input
+                        type="text"
+                        name="name"
+                        value={infoF.name}
+                        onChange={handleChange}
+                        placeholder='Nombre del platillo...'
+                        className='w-full bg-gray-200/30 p-2 rounded-sm'
+                    />
+                </div>
 
-            {/* Country of origin */}
-            <div className='w-full flex flex-col items-start'>
-                <b className='text-base sm:text-lg'>Country:</b>
-                <input
-                    type="text"
-                    name="country"
-                    value={infoF.country}
-                    onChange={handleChange}
-                    placeholder='Country of origin...'
-                    className='w-full bg-gray-200 p-2 rounded-sm text-sm sm:text-base'
-                />
-            </div>
+                {/* País de origen */}
+                <div className='w-full flex flex-col items-start'>
+                    <b className='text-lg'>Country:</b>
+                    <input
+                        type="text"
+                        name="country"
+                        value={infoF.country}
+                        onChange={handleChange}
+                        placeholder='País de origen...'
+                        className='w-full bg-gray-200/30 p-2 rounded-sm'
+                    />
+                </div>
 
-            {/* Category */}
-            <div className='w-full flex flex-col items-start'>
-                <b className='text-base sm:text-lg'>Category:</b>
-                <input
-                    type="text"
-                    name="category"
-                    value={infoF.category}
-                    onChange={handleChange}
-                    placeholder='E.g. Dessert, Main course...'
-                    className='w-full bg-gray-200 p-2 rounded-sm text-sm sm:text-base'
-                />
-            </div>
+                {/* URL de la Imagen */}
+                <div className='w-full flex flex-col items-start'>
+                    <b className='text-lg'>URL image:</b>
+                    <input
+                        type="text"
+                        name="img"
+                        value={infoF.img}
+                        onChange={handleChange}
+                        placeholder='https://enlace-de-imagen.com...'
+                        className='w-full bg-gray-200/30 p-2 rounded-sm'
+                    />
+                </div>
 
-            {/* Image URL */}
-            <div className='w-full flex flex-col items-start'>
-                <b className='text-base sm:text-lg'>Image URL:</b>
-                <input
-                    type="text"
-                    name="img"
-                    value={infoF.img}
-                    onChange={handleChange}
-                    placeholder='https://image-link.com...'
-                    className='w-full bg-gray-200 p-2 rounded-sm text-sm sm:text-base'
-                />
-            </div>
+                {/* Instrucciones / Detalles */}
+                <div className='w-full h-auto flex flex-col items-start'>
+                    <b className='text-lg'>Instructions:</b>
+                    <textarea
+                        name="Instructions"
+                        value={infoF.Instructions}
+                        onChange={handleChange}
+                        placeholder='Da detalles sobre la preparación del platillo...'
+                        className='w-full min-h-37.5 resize-none bg-gray-200/30 p-2 rounded-sm h-24'
+                    />
+                </div>
 
-            {/* Instructions / Details */}
-            <div className='w-full h-auto flex flex-col items-start'>
-                <b className='text-base sm:text-lg'>Instructions:</b>
-                <textarea
-                    name="Instructions"
-                    value={infoF.Instructions}
-                    onChange={handleChange}
-                    placeholder='Give details about how to prepare the dish...'
-                    className='w-full resize-none bg-gray-200 p-2 rounded-sm h-20 sm:h-24 text-sm sm:text-base'
-                />
-            </div>
+                {/* Ingredientes */}
+                <div className='w-full flex flex-col items-start'>
+                    <b className='text-lg'>Ingredients:</b>
+                    <textarea
+                        value={infoF.ingredients.join(', ')}
+                        onChange={handleIngredientsChange}
+                        placeholder='Da detalles sobre los ingredientes...'
+                        className='w-full resize-none bg-gray-200/30 p-2 rounded-sm h-20'
+                    />
+                    <p className="text-[14px] mt-1 text-orange-400"><b>Note:</b> Divide the ingredients by comas (,).</p>
+                </div>
+            </section>
 
-            {/* Ingredients */}
-            <div className='w-full flex flex-col items-start'>
-                <b className='text-base sm:text-lg'>Ingredients:</b>
-                <textarea
-                    value={infoF.ingredients.join(', ')}
-                    onChange={handleIngredientsChange}
-                    placeholder='Give details about the ingredients...'
-                    className='w-full resize-none bg-gray-200 p-2 rounded-sm h-16 sm:h-20 text-sm sm:text-base'
-                />
-                <p className="text-xs mt-1"><b>Note:</b> Separate ingredients with commas (,).</p>
-            </div>
-
-            <button className="text-sm p-2 bg-blue-300 text-white rounded-sm hover:bg-blue-500 hover:shadow-2xl/50 hover:shadow-blue-900 transition-all cursor-pointer hover:scale-105 active:scale-100 mt-4 w-full sm:w-auto"
+            <button className="text-sm p-3 w-full bg-blue-400 text-white rounded-sm hover:bg-blue-500 hover:shadow-2xl/50 hover:shadow-blue-900 transition-all cursor-pointer hover:scale-105 active:scale-100 mt-4 mb-10"
                 onClick={(e) => { saveInfo(e) }}
             >
                 Create Meal

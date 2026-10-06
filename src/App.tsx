@@ -39,7 +39,7 @@ function GroupContainer() {
       <DataProvider>
         <main className="w-full h-screen relative grid grid-cols-[1fr_auto]">
           <Recipes setInfoView={setInfoView} />
-          <DetailsView infoView={infoView} />
+          <DetailsView infoView={infoView} setInfoView={setInfoView} />
         </main>
       </DataProvider>
     </div>

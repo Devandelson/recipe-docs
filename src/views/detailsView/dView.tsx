@@ -17,7 +17,8 @@ import { type meal, useProvider, type infoRequest } from '@/shared/context/dataC
 import { useState, useEffect } from 'react';
 
 interface ComponentView {
-    infoView: ViewProps
+    infoView: ViewProps,
+    setInfoView: React.Dispatch<React.SetStateAction<ViewProps>>,
 };
 
 function localFetch(useRequest: infoRequest | null, infoView: ViewProps): any {
@@ -38,15 +39,15 @@ function localFetch(useRequest: infoRequest | null, infoView: ViewProps): any {
     };
 }
 
-export default function DetailView({ infoView }: ComponentView) {
+export default function DetailView({ infoView, setInfoView }: ComponentView) {
     const [searchData, setSearchData] = useState<meal | null>(null);
     const { useRequest } = useProvider();
 
     useEffect(() => {
-        // Evita ejecutar la petición si la vista está cerrada o no hay ID
-        if (infoView.stateView === 'closed' || !infoView.idMeal) return;
+        if (infoView.stateView === 'closed' || !infoView.idMeal) {
+            return;
+        }
 
-        let isMounted = true;
         const defaultInfo: meal | null = {
             idMeal: '',
             name: '',
@@ -54,88 +55,85 @@ export default function DetailView({ infoView }: ComponentView) {
             img: '',
             Instructions: '',
             ingredients: [''],
-            stateView: infoView.stateView, // Dynamically match infoView state
+            stateView: infoView.stateView,
             category: '',
             typeInfo: 'local'
         };
 
         async function fetchMeal() {
             try {
-                let meal: any = null;
+                let mealData: any = null;
 
-                if (infoView.typeInfo == 'local') {
-                    meal = localFetch(useRequest, infoView);
+                if (infoView.typeInfo === 'local') {
+                    mealData = localFetch(useRequest, infoView);
                 } else {
                     const mealFetch = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${infoView.idMeal}`);
                     const resultJson = await mealFetch.json();
-                    const mealBD = resultJson.meals[0];
+                    const mealBD = resultJson.meals?.[0];
+
+                    if (!mealBD) {
+                        setSearchData(defaultInfo)
+                        return;
+                    }
 
                     const stringIngredients: string[] = [];
-
                     for (let x = 1; x <= 20; x++) {
                         const key = `strIngredient${x}` as keyof typeof mealBD;
                         const ingredient = (mealBD[key] as string) ?? '';
-
                         if (ingredient.trim() !== '') {
                             stringIngredients.push(ingredient.trim());
                         }
                     }
 
-                    meal = {
+                    mealData = {
                         idMeal: mealBD.idMeal,
                         name: mealBD.strMeal,
-                        country: mealBD.strCountry,
+                        country: mealBD.strArea, // Note: TheMealDB uses strArea for country
                         img: mealBD.strMealThumb,
                         Instructions: mealBD.strInstructions,
                         ingredients: stringIngredients,
                         stateView: infoView.stateView,
                         category: mealBD.strCategory,
                         typeInfo: 'server'
-                    }
+                    };
                 }
 
-                if (isMounted) {
-                    if (infoView.stateView != 'save') {
-                        setSearchData(meal);
-                    } else {
-                        setSearchData(defaultInfo);
-                    }
-                };
-            } catch (error) {
-                if (isMounted) {
+                if (infoView.stateView !== 'save') {
+                    setSearchData(mealData);
+                } else {
                     setSearchData(defaultInfo);
                 }
+            } catch (error) {
+                setSearchData(defaultInfo);
             }
         }
 
         fetchMeal();
-        return () => {
-            isMounted = false;
-        };
-    }, [infoView.idMeal, infoView.stateView]);
+    }, [infoView.idMeal, infoView.stateView, infoView.typeInfo]);
 
-    if (!searchData) return <Close></Close>;
+    if (!infoView || infoView?.stateView === 'closed') return <Close></Close>;
 
     const renderView = () => {
         switch (searchData?.stateView) {
             case 'open':
                 return (
-                    <Data data={searchData} setSearchData={setSearchData} />
+                    <Data data={searchData} setInfoView={setInfoView} />
                 );
             case 'edit':
                 return (
-                    <Edit data={searchData} setSearchData={setSearchData} />
+                    <Edit data={searchData} setInfoView={setInfoView} />
                 );
             case 'save':
                 return (
-                    <Save data={searchData} setSearchData={setSearchData} />
+                    <Save data={searchData} setInfoView={setInfoView} />
                 );
-            default: return (<Close />);
+            default:
+                return null;
         }
     };
 
     return (
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" key={searchData?.stateView}>
             {renderView()}
         </AnimatePresence>
     );

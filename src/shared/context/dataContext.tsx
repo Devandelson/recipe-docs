@@ -25,27 +25,30 @@ export interface infoRequest {
 
 interface providerProps {
     useRequest: infoRequest | null;
-    setUserRequest: React.Dispatch<React.SetStateAction<infoRequest | null>>
+    setUserRequest: React.Dispatch<React.SetStateAction<infoRequest | null>>,
+    setPage: React.Dispatch<React.SetStateAction<number>>,
 }
 
 const dataContext = createContext<providerProps | null>(null);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
     const [useRequest, setUserRequest] = useState<infoRequest | null>(null);
+    const [page, setPage] = useState(20);
 
     useEffect(() => {
         async function makingRequest() {
-            const result: infoRequest = await RequestData();
+            const result: infoRequest = await RequestData(page);
             setUserRequest(result);
         }
 
         makingRequest();
-    }, [])
+    }, [page])
 
     return (
         <dataContext.Provider value={{
             useRequest: useRequest,
-            setUserRequest: setUserRequest
+            setUserRequest: setUserRequest,
+            setPage: setPage
         }}>
             {children}
         </dataContext.Provider>
