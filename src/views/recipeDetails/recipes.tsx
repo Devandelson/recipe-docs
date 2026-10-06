@@ -16,7 +16,7 @@ import { useProvider } from '@/shared/context/dataContext.tsx';
 
 // components
 import Header from '../header.tsx'
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ComponentRecipe {
     setInfoView: React.Dispatch<React.SetStateAction<ViewProps>>

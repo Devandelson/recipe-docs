@@ -17,13 +17,12 @@ export default function containerComponent({ children, setInfoView, data }: {
                         <button className="absolute bg-white text-black text-lg py-2 bottom-0
                         left-0 w-full z-20 cursor-pointer
                         hover:border-b-2 hover:border-gray-500
-                        " onClick={() => setInfoView((prev) => {
-                            if (!prev) return null;
-                            return {
-                                ...prev,
-                                stateView: 'closed'
-                            };
-                        })}>
+                        " onClick={() =>
+                                setInfoView((prev) => ({
+                                    ...prev,
+                                    stateView: 'closed',
+                                }))
+                            }>
                             Close details
                         </button>
 
