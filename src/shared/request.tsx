@@ -24,7 +24,7 @@ export async function RequestData(page: number): Promise<infoRequest> {
         return {
             idMeal: meal.idMeal,
             name: meal.strMeal,
-            country: meal.strArea, // La API usa 'strArea' para el país/región
+            country: meal.strArea ?? 'desconocido',
             img: meal.strMealThumb,
             Instructions: '',
             ingredients: [''],

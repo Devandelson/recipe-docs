@@ -12,7 +12,7 @@ export default function containerComponent({ children, setInfoView, data }: {
     return (
         <AnimatePresence mode="wait">
             {data && (
-                <div className="h-[calc(100vh-8px)] relative p-2">
+                <div className="h-[calc(100vh-8px)] overflow-y-auto relative p-2">
                     <section className="w-full max-w-90 h-full bg-gray-800 text-white max-md:fixed max-md:max-w-full max-md:top-0 max-md:left-0 z-30 max-md:h-screen rounded-lg p-2 relative scrollbar-none overflow-auto">
                         <button className="absolute bg-white text-black text-lg py-2 bottom-0
                         left-0 w-full z-20 cursor-pointer
@@ -27,23 +27,26 @@ export default function containerComponent({ children, setInfoView, data }: {
                         </button>
 
 
-                        <article className="w-full h-auto md:h-screen max-h-full overflow-y-auto scrollbar-none md:sticky top-0 text-sm p-3 sm:p-4 flex flex-col gap-3">
+                        <article className="w-full h-auto md:h-screen max-h-full overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300/50 md:sticky top-0 text-sm p-3 sm:p-4 flex flex-col gap-3">
                             <motion.div
                                 // Key compuesta única usando Template Literals
                                 key={`${data.stateView}-${data.idMeal}`}
                                 initial={{
                                     opacity: 0,
-                                    y: -20,
+                                    y: 50,
+                                    scale: 0.95,
                                     filter: 'blur(8px)'
                                 }}
                                 animate={{
                                     opacity: 1,
                                     y: 0,
+                                    scale: 1,
                                     filter: 'blur(0px)'
                                 }}
                                 exit={{
                                     opacity: 0,
-                                    y: 20, // Cambiar a positivo al salir da un efecto visual de continuidad hacia abajo
+                                    y: 30,
+                                    scale: 0.95,
                                     filter: 'blur(8px)'
                                 }}
                                 transition={{

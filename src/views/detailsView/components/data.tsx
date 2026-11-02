@@ -15,7 +15,7 @@ export default function View({ data, setInfoView }: {
 
             <img src={data?.img} className='w-full h-50 rounded-lg object-cover mt-2 mb-2' />
             <b className="text-lg">Instructions: </b>
-            <div className='flex items-start flex-col gap-2 max-h-[350px] overflow-y-auto scrollbar-thin pr-2'>
+            <div className='flex items-start flex-col gap-2'>
                 <p>{data?.Instructions}</p>
             </div>
 

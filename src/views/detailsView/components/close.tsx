@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 
 export default function View() {
     return (
-        <motion.section className="w-75 bg-gray-100/50 max-md:hidden"
+        <motion.section className="w-75 max-md:hidden"
             // Key compuesta única usando Template Literals
             initial={{
                 opacity: 0,

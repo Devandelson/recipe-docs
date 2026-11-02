@@ -10,8 +10,10 @@ function App() {
 function BackElements() {
   return (
     <section className="w-full h-screen fixed top-0 left-0 z-0">
-      <span className="block w-3/12 aspect-square absolute -top-1/12 -left-1/12 rounded-full bg-blue-600 z-10 blur-3xl"></span>
-      <span className="block w-3/12 aspect-square absolute -bottom-1/12 -right-1/12 rounded-full bg-blue-600 z-10 blur-3xl"></span>
+      <span className="absolute top-0 left-0 w-full h-full bg-white/30 backdrop-blur-2xl z-10">
+      </span>
+      <span className="block w-3/12 aspect-square absolute -top-1/12 -left-1/12 rounded-full bg-blue-600 blur-3xl -z-10"></span>
+      <span className="block w-3/12 aspect-square absolute -bottom-1/12 -right-1/12 rounded-full bg-blue-600 -z-10 blur-3xl"></span>
     </section>
   )
 }
@@ -35,7 +37,7 @@ function GroupContainer() {
   });
 
   return (
-    <div className="w-full relative h-screen rounded-sm z-10 bg-white/30 backdrop-blur-2xl">
+    <div className="w-full relative h-screen rounded-sm z-10 max-w-7xl mx-auto">
       <DataProvider>
         <main className="w-full h-screen relative grid grid-cols-[1fr_auto]">
           <Recipes setInfoView={setInfoView} />

@@ -5,7 +5,7 @@ import { faTrashCan } from '@fortawesome/free-regular-svg-icons/faTrashCan';
 import { faEdit } from '@fortawesome/free-regular-svg-icons';
 import Swal from 'sweetalert2';
 import recipe from '@/assets/recipe.png';
-import { motion } from 'motion/react';
+import { motion, stagger } from 'motion/react';
 
 // types
 import { type meal, type infoRequest } from '@/shared/context/dataContext.tsx';
@@ -20,6 +20,17 @@ import { useEffect, useState } from 'react';
 
 interface ComponentRecipe {
     setInfoView: React.Dispatch<React.SetStateAction<ViewProps>>
+};
+
+// Animation variants (stagger item por item)
+const containerVariants = {
+    hidden: {},
+    visible: { transition: { delayChildren: stagger(0.08) } }
+};
+
+const itemVariants = {
+    hidden: { x: -15, opacity: 0 },
+    visible: { x: 0, opacity: 1 }
 };
 
 export default function Recipes({ setInfoView }: ComponentRecipe) {
@@ -72,20 +83,9 @@ export default function Recipes({ setInfoView }: ComponentRecipe) {
 
     return (
         <motion.div className='p-4 h-screen grid grid-rows-[auto_auto_auto_auto_1fr]'
-            initial={{
-                y: -15,
-                opacity: 0
-            }}
-
-            animate={{
-                y: 0,
-                opacity: 1
-            }}
-
-            exit={{
-                y: -15,
-                opacity: 0
-            }}
+            initial={{  y: -15, opacity: 0 }}
+            animate={{   y: 0,opacity: 1 }}
+            exit={{ y: -15, opacity: 0 }}
         >
             <header className='flex items-center gap-4  '>
                 <img src={recipe} />
@@ -102,9 +102,13 @@ export default function Recipes({ setInfoView }: ComponentRecipe) {
             </section>
 
 
-            <div className='w-full overflow-y-auto grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 scrollbar-thumb-sky-700 scrollbar-track-sky-100 pr-1.5'
+            <motion.div className='w-full overflow-y-auto grid grid-cols-[repeat(3,minmax(auto,1fr))]
+            max-lg:grid-cols-[repeat(2,minmax(auto,1fr))] max-sm:grid-cols-[minmax(auto,1fr)] gap-3 scrollbar-thumb-sky-700 scrollbar-track-sky-100 pr-1.5'
                 onScroll={handleScroll}
                 id='scrollITems'
+                variants={containerVariants}
+                initial="hidden"
+                animate={loading ? "visible" : "hidden"}
             >
                 {
                     loading == false ? (waitMessage) :
@@ -120,7 +124,7 @@ export default function Recipes({ setInfoView }: ComponentRecipe) {
                             </div>
                         )
                 }
-            </div>
+            </motion.div>
         </motion.div>
     )
 }
@@ -178,17 +182,9 @@ function RecipeItem({ name, img, country, setInfoView, idMeal, typeInfo }:
 
     return (
         <motion.div className="relative flex-col rounded-xl text-gray-700 bg-transparent p-4
-        grid grid-rows-[auto_1fr_auto] transition-all group hover:scale-[1.02]
+        grid grid-rows-[auto_1fr_auto] max-sm:max-w-80 max-sm:mx-auto w-full transition-all group hover:scale-[1.02]
         "
-            initial={{
-                x: -15,
-                opacity: 0
-            }}
-
-            animate={{
-                x: 0,
-                opacity: 1
-            }}
+            variants={itemVariants}
 
             exit={{
                 x: -15,
@@ -196,7 +192,9 @@ function RecipeItem({ name, img, country, setInfoView, idMeal, typeInfo }:
             }}
         >
             <span className='w-full h-[80%] block top-[20%] left-0 bg-white -z-10 shadow-md absolute rounded-xl group-hover:shadow-2xl transition-all'></span>
-            <span className='absolute p-1 px-3 rounded-3xl text-center top-7 left-7 z-10 bg-orange-200 text-sm'>From {country}</span>
+            <span className='absolute p-1 px-3 rounded-3xl text-center top-7 left-7 z-10 bg-orange-200 text-sm'> 
+                {`${country == 'desconocido' ? 'Desconocido' : `From ${country}`}`} 
+            </span>
 
 
             <section className='relative w-full'>
